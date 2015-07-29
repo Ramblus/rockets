@@ -12,11 +12,39 @@ module.exports = class Master
 
   # Fork workers, which will each create a `Worker` process.
   fork: () ->
+    cluster.on 'fork', @registerWorkerEvents.bind(@)
     cluster.fork() for _ in [0...(os.cpus().length-1)]
+
+
+  # Registers events on a new cluster worker
+  registerWorkerEvents: (worker) ->
+    worker.on 'error', Log.ErrorHandler
+
+    # Called when a worker process is started
+    worker.on 'online', ->
+      log.info {
+        event: 'worker.online',
+        id: worker.id
+      }
+
+    # Fork a new worker when this one dies
+    worker.on 'disconnect', ->
+      cluster.fork()
+
+    # Might be good to know why a worker died
+    worker.on 'exit', (code, signal) ->
+      log.info {
+        event: 'worker.exit',
+        code: code,
+        signal: signal,
+        id: worker.id,
+      }
 
 
   # Returns an array of model fetch tasks to run
   run: () ->
+    process.started = Date.now() / 1000
+
     oauth = new OAuth2()
     queue = new ModelQueue()
 
@@ -26,7 +54,7 @@ module.exports = class Master
     # This will be the task schedule to keep iterating through.
     tasks = []
 
-    for _ in [0...20]
+    for _ in [0...30]
       tasks.push comments.reversed()
       tasks.push posts.forward()
 
@@ -35,36 +63,3 @@ module.exports = class Master
     # Run all tasks in series, forever.
     async.forever (next) ->
       async.series tasks, next
-
-
-    ###
-    Forward requests
-    ================
-    Fetches models by requesting info on future ID's. All tasks keep track of
-    the most recently processed model, so bulk ID requests are made using that
-    id followed by the next 100 successive ID's.
-
-    Reversed requests
-    =================
-    Fetches models from newest to oldest, and uses 'forward' requests to patch
-    the gaps that occur when the newest model in the response is too far ahead
-    of the most recently processed model. For example, if we just processed
-    ID '100', then receive ID '220', that means that there has been ~120 models
-    since, creating a gap between '100' and '120' due to the 100 model limit.
-    By requesting 101 -> 120, we patch the 'backlog' gap using forward requests.
-
-    Posts
-    =====
-    Requesting posts in reverse is not ideal because reddit caches the results
-    of /r/all/new for 60 seconds (even when using the API). Posts therefore have
-    to be requested forward by requesting info on future ID's. This yields posts
-    very soon after they are created (therefore low latency), but there is a
-    risk of encountering a deadzone where the list of ID's will never resolve.
-    The solution is to do a reversed post request every ~60 seconds, just to
-    check that things are still on track.
-
-    Comments
-    ========
-    Requesting comments in reverse is ideal, because reddit does not cache the
-    results. We just keep requesting in reverse indefinitely.
-    ###

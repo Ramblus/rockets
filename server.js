@@ -8,13 +8,13 @@ request = require('request');
 uuid    = require('uuid');
 bunyan  = require('bunyan');
 
-// Allows us to `require` .coffee files
+// Allows us to `require` .coffee files.
 require('coffee-script').register();
 
-// Require all files in /src
+// Require all files in /src.
 require('./src')();
 
-// Global log
+// Global log used by both master and worker processes.
 log = new Log();
 
 // Create a new master process if master or create a worker if it's a fork.

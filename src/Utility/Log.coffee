@@ -3,10 +3,16 @@ Wraps around bunyan to create a consistent logging interface.
 ###
 module.exports = class Log
 
-  constructor: () ->
-    @loggers =
+  @ErrorHandler: (error) ->
+    if error then log.error {
+      error: error,
+      stack: error.stack
+    }
 
-      # Info log
+
+  constructor: () ->
+
+    @loggers =
       info: bunyan.createLogger({
         name: 'rockets',
         streams: [
@@ -17,7 +23,6 @@ module.exports = class Log
         ]
       })
 
-      # Error log
       error: bunyan.createLogger({
         name: 'rockets',
         streams: [

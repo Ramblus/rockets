@@ -4,7 +4,7 @@ Wraps around a socket connection, providing an ID to identify it by.
 module.exports = class SocketClient
 
   constructor: (@socket) ->
-    @id = uuid.v4() # Incremental ID's would get mixed up across workers.
+    @id = uuid.v4()
 
 
   # Sends data to this client via it's socket connection.
@@ -12,6 +12,7 @@ module.exports = class SocketClient
   send: (data, done) ->
     if typeof data isnt 'string' then data = JSON.stringify(data)
 
-    @socket.send data, (error) ->
-      if error then log.error error, error.stack
-      done?()
+    if @socket?.readyState is ws.OPEN
+      @socket.send data, Log.ErrorHandler
+
+    done()

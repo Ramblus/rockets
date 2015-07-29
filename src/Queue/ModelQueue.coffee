@@ -8,7 +8,7 @@ module.exports = class ModelQueue extends Queue
   process: (model, next) ->
 
     # Exclude deleted models entirely.
-    if model.data.author?.toLowerCase() in ['[deleted]', '[removed]']
+    if model.data.author.toLowerCase() in ['[deleted]', '[removed]']
       return next()
 
     switch model.kind

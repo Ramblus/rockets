@@ -6,6 +6,8 @@ Worker process, responsible for:
 module.exports = class Worker
 
   constructor: () ->
+    process.on 'message', @onMessage.bind(@)
+
     @server = new SocketServer()
     @queue  = new EmitQueue()
 
@@ -13,15 +15,8 @@ module.exports = class Worker
 
   # Starts the server and handling of incoming messages from the master process.
   run: () ->
-    @server.listen(port: process.env.PORT)
-    process.on('message', @onMessage.bind(@))
-    process.on('error', @onError.bind(@))
-
-
-  # Called when an error occurred.
-  # See https://nodejs.org/api/child_process.html#child_process_event_error
-  onError: (err) ->
-    log.error err, err?.stack
+    @server.listen
+      port: +process.env.PORT or 3210
 
 
   # Sends a task to the emit queue which will send the model to the client.
@@ -42,6 +37,4 @@ module.exports = class Worker
   # and a 'model'. Sends the model to all matching subscriptions in the channel.
   onMessage: (message) ->
     channel = @server.getChannels().getChannel(message.channel)
-
-    if channel
-      @sendToChannel channel, message.model
+    @sendToChannel channel, message.model if channel

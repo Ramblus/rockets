@@ -118,4 +118,4 @@ There are a few ways to resupply and assist the CC:
 
 ## Credits
 
-Illustrations by Ken Samonte.
+Illustrations by [Ken Samonte](http://cargocollective.com/kensamonte/).

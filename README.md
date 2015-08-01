@@ -10,14 +10,13 @@ Many reddit bots rely on monitoring new content, constantly sending requests to 
 
 You will receive JSON models exactly as they appear in reddit listings, ie. with `kind` and `data` keys. These will be sent one at a time, but are not guaranteed to be in perfect chronological order due to the level of concurrency on the server.
 
-## Demo
+#### Demo
 
-```bash
-git clone git@github.com:rtheunissen/rockets
-cd rockets
-npm install
-node client.js
-```
+See [rockets-demo](https://github.com/rtheunissen/rockets-demo).
+
+#### Client
+
+See [rockets-client](https://github.com/rtheunissen/rockets-client).
 
 ## Subscriptions
 

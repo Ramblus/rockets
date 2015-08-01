@@ -112,7 +112,6 @@ There are a few ways to resupply and assist the CC:
 
 - Use filters to avoid receiving unwanted data.
 - Donate a few dollars to help cover server costs.
-- Sponsor this app if you have a lot of bandwidth at your disposal.
 
 ## Credits
 

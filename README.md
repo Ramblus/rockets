@@ -2,13 +2,13 @@
 ---
 
 **Mission**
->Provide a way for bots to continuously monitor new content on reddit.com without using the API.
+>Provide a way to continuously monitor new content on reddit.com in near real-time.
 
 Many reddit bots rely on monitoring new content, constantly sending requests to keep up. Unfortunately this means that bots can't use their precious rate-limit tokens to then *do something* with that content.
 
 *Rockets* allows you to subscribe to a `channel`, with the ability to specify content `filters`. All you need to do is open a web socket connection to the command center at `ws://rockets.cc:3210` and transmit your subscription.
 
-The client receives JSON models exactly as they appear in reddit listings (with `kind` and `data` keys). These will be sent one at a time, but are not guaranteed to be in perfect chronological order due to the level of concurrency on the server.
+The client receives JSON models exactly as they appear in reddit listings (with `kind` and `data` keys). These will be sent one at a time, but are not guaranteed to be in perfect chronological order.
 
 For a detailed overview of the JSON models, see the [reddit JSON wiki](https://github.com/reddit/reddit/wiki/JSON). Note that
 the wiki might not always match the actual model data, because reddit doesn't always update it when they make changes to the models.

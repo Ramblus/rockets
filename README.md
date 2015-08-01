@@ -8,7 +8,10 @@ Many reddit bots rely on monitoring new content, constantly sending requests to 
 
 *Rockets* allows you to subscribe to a `channel`, with the ability to specify content `filters`. All you need to do is open a web socket connection to the command center at `ws://rockets.cc:3210` and transmit your subscription.
 
-You will receive JSON models exactly as they appear in reddit listings, ie. with `kind` and `data` keys. These will be sent one at a time, but are not guaranteed to be in perfect chronological order due to the level of concurrency on the server.
+The client receives JSON models exactly as they appear in reddit listings (with `kind` and `data` keys). These will be sent one at a time, but are not guaranteed to be in perfect chronological order due to the level of concurrency on the server.
+
+For a detailed overview of the JSON models, see the [reddit JSON wiki](https://github.com/reddit/reddit/wiki/JSON). Note that
+the wiki might not always match the actual model data, because reddit doesn't always update it when they make changes to the models.
 
 #### Demo
 

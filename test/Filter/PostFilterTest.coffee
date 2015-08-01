@@ -46,7 +46,9 @@ describe 'PostFilter', ->
 
 
   describe 'subreddit', ->
-    match('subreddit', model.data.subreddit = 'aww')
+    model.data.subreddit = 'aww'
+    match('subreddit', 'aww')
+    match('subreddit', 'all')
 
 
   describe 'author', ->

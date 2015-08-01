@@ -50,7 +50,7 @@ module.exports = class Filter
 
   # Checks if a model's subreddit matches any of the values in the filter.
   subreddit: (model, filter) ->
-    return @check(filter, model.data.subreddit)
+    return @check(filter, model.data.subreddit) or @check(filter, 'all')
 
 
   # Checks if a model's user/author matches any of the values in the filter.

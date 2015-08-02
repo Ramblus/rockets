@@ -64,7 +64,7 @@ module.exports = class SocketServer
     }
 
     # Attempt to parse the incoming message
-    if data = @parseMessage message, client then @handleData(data)
+    if data = @parseMessage(message, client) then @handleData(data, client)
 
 
   # Determines and returns and appropriate filter for the given data.
@@ -103,7 +103,7 @@ module.exports = class SocketServer
   # Handles the data of a parsed message.
   # Creates a subscription if the data produces a valid channel.
   handleData: (data, client) ->
-    channel = @getChannel data, client
-    filters = @getFilters data, client
+    channel = @getChannel(data, client)
+    filters = @getFilters(data, client)
 
     if channel then channel.addSubscription(new Subscription(client, filters))

@@ -19,3 +19,4 @@ module.exports = class SocketClient
       @socket.send data, Log.ErrorHandler
 
     done()
+    return

@@ -54,30 +54,6 @@ module.exports = class SocketServer
     }
 
 
-  # Determines parameters for a subscription's channel and filter values.
-  getSubscriptionParameters: (data, callback) ->
-    channel = @channels.createChannel(data.channel)
-
-    switch data.channel
-      when Channel.POSTS    then filters = new PostFilter(data.filters)
-      when Channel.COMMENTS then filters = new CommentFilter(data.filters)
-
-    callback {channel, filters}
-
-
-  # Attempts to parse a message to determine the channel and channel filters.
-  parseMessage: (message, callback) ->
-    try
-      data = JSON.parse(message)
-    catch error
-      return Log.ErrorHandler(error)
-
-    if data.channel in [Channel.POSTS, Channel.COMMENTS]
-      @getSubscriptionParameters(data, callback)
-    else
-      callback()
-
-
   # Called when an incoming message is received.
   onMessage: (message, client) ->
 
@@ -87,9 +63,47 @@ module.exports = class SocketServer
       client: client.id,
     }
 
-    @parseMessage message, (data) ->
-      if data
-        channel = data.channel
-        filters = data.filters
+    # Attempt to parse the incoming message
+    if data = @parseMessage message, client then @handleData(data)
 
-        channel.addSubscription(new Subscription(client, filters))
+
+  # Determines and returns and appropriate filter for the given data.
+  getFilters: (data, client) ->
+    switch data.channel
+      when Channel.POSTS    then return new PostFilter(data.filters)
+      when Channel.COMMENTS then return new CommentFilter(data.filters)
+
+
+  # Determines and returns a channel instance for the given data.
+  # Sends an error to the client if the channel is not supported.
+  getChannel: (data, client) ->
+    if data.channel in [Channel.POSTS, Channel.COMMENTS]
+      return @channels.createChannel(data.channel)
+
+    client.send {
+      error:
+        name: 'ValueError'
+        message: 'Unsupported channel'
+    }
+
+
+  # Attempts to parse an incoming message.
+  # Sends an error to the client if the message could not be parsed.
+  parseMessage: (message, client) ->
+    try
+      return JSON.parse(message)
+    catch error
+      client.send {
+        error:
+          name: error.name
+          message: error.message
+      }
+
+
+  # Handles the data of a parsed message.
+  # Creates a subscription if the data produces a valid channel.
+  handleData: (data, client) ->
+    channel = @getChannel data, client
+    filters = @getFilters data, client
+
+    if channel then channel.addSubscription(new Subscription(client, filters))

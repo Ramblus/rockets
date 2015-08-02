@@ -9,7 +9,7 @@ module.exports = class SocketClient
 
   # Sends data to this client via it's socket connection.
   # Will be encoded as JSON if not already a string.
-  send: (data, done) ->
+  send: (data) ->
 
     # Encode to JSON if not already a string
     if typeof data isnt 'string' then data = JSON.stringify(data)
@@ -17,6 +17,3 @@ module.exports = class SocketClient
     # Only send if the socket connection is still open
     if @socket?.readyState is ws.OPEN
       @socket.send data, Log.ErrorHandler
-
-    done()
-    return
